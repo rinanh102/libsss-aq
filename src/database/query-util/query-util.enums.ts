@@ -1,0 +1,43 @@
+export enum TransformJoinResultTypes {
+    SINGLE,
+    MULTI,
+}
+
+export enum FilterOperators {
+    eq = 'eq',
+    orEq = 'orEq',
+    gt = 'gt',
+    orGt = 'orGt',
+    lt = 'lt',
+    orLt = 'orLt',
+    gte = 'gte',
+    orGte = 'orGte',
+    lte = 'lte',
+    orLte = 'orLte',
+    in = 'in',
+    orIn = 'orIn',
+    notIn = 'notIn',
+    orNotIn = 'orNotIn',
+    contains = 'contains',
+    orContains = 'orContains',
+    startWith = 'startWith',
+    orStartWith = 'orStartWith',
+    endWith = 'endWith',
+    orEndWith = 'orEndWith',
+    not = 'not',
+    orNot = 'orNot',
+    regex = 'regex',
+    orRegex = 'orRegex',
+    isNull = 'isNull',
+    orIsNull = 'orIsNull',
+    isNotNull = 'isNotNull',
+    orIsNotNull = 'orIsNotNull',
+    isTrue = 'isTrue',
+    orIsTrue = 'orIsTrue',
+    isFalse = 'isFalse',
+    orIsFalse = 'orIsFalse',
+    group = 'group',
+    orGroup = 'orGroup',
+}
+
+export type SortType = 'asc' | 'desc';
