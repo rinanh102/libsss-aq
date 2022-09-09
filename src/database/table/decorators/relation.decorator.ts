@@ -9,6 +9,9 @@ export type RelationOptions = {
     localId: string;
     refId?: string;
     relationship?: TableRelationships;
+    options?: {
+        notUseJoinStatement?: boolean;
+    };
 };
 
 export function Relation(options: RelationOptions): PropertyDecorator {

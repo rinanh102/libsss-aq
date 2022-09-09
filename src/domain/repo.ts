@@ -1,9 +1,10 @@
 import { Optional } from '@heronjs/common';
+import { EavEntityChangeAttributesValuesOutput } from '../eav';
 
 export interface IRepo<T> {
-    create: (input: any) => Promise<T>;
-    update: (id: string, input: any) => Promise<T>;
-    delete: (id: string) => Promise<T>;
+    create: (entity: T) => Promise<T>;
+    update: (id: string, entity: T, attributes?: EavEntityChangeAttributesValuesOutput) => Promise<T>;
+    delete: (id: string) => Promise<string>;
     findAll: () => Promise<T[]>;
     getById: (id: string) => Promise<Optional<T>>;
 }

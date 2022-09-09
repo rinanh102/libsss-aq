@@ -5,7 +5,9 @@ import { validateOrReject } from 'class-validator';
 export class ValidatorUtil {
     static async validateOrReject(input: any) {
         try {
-            await validateOrReject(input);
+            await validateOrReject(input, {
+                skipMissingProperties: true,
+            });
         } catch (errors) {
             throw new RuntimeError(Errors.VALIDATION_ERR, 10000, 'Validate failed', errors as any);
         }
@@ -14,10 +16,11 @@ export class ValidatorUtil {
     static async validatePlain<T>(classModel: ClassConstructor<T>, plain: object): Promise<T> {
         try {
             const model = plainToClass(classModel, plain);
-            await validateOrReject(model as any);
+            await validateOrReject(model as any, {
+                skipMissingProperties: true,
+            });
             return instanceToPlain(model) as T;
         } catch (errors) {
-            console.log(errors);
             throw new RuntimeError(Errors.VALIDATION_ERR, 10000, 'Validate failed', errors as any);
         }
     }

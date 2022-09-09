@@ -3,9 +3,8 @@ import {
     IsArray,
     IsBoolean,
     IsEnum,
-    IsNotEmpty,
+    IsDefined,
     IsNumber,
-    IsOptional,
     IsString,
     Matches,
     MaxLength,
@@ -27,7 +26,7 @@ export type EavAttributeCreateInput = {
 
 export class EavAttributeCreateInputModel implements EavAttributeCreateInput {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     @MinLength(1)
     @MaxLength(32)
@@ -35,38 +34,33 @@ export class EavAttributeCreateInputModel implements EavAttributeCreateInput {
     public readonly code!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     @MinLength(1)
     public readonly label!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsEnum(EavAttributeTypes)
     public readonly type!: EavAttributeTypes;
 
     @Expose()
-    @IsOptional()
     @IsEnum(EavAttributeStatus)
     public readonly status?: EavAttributeStatus;
 
     @Expose()
-    @IsOptional()
     @IsNumber()
     public readonly sortOrder?: number;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly visibility?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly isRequired?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsArray()
     public readonly options?: any[];
 }
@@ -84,38 +78,32 @@ export type EavAttributeUpdateInput = {
 };
 export class EavAttributeUpdateInputModel implements EavAttributeUpdateInput {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     public readonly code!: string;
 
     @Expose()
-    @IsOptional()
     @IsString()
     @MinLength(1)
     public readonly label?: string;
 
     @Expose()
-    @IsOptional()
     @IsEnum(EavAttributeStatus)
     public readonly status?: EavAttributeStatus;
 
     @Expose()
-    @IsOptional()
     @IsNumber()
     public readonly sortOrder?: number;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly visibility?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly isRequired?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsArray()
     public readonly options?: any[];
 }

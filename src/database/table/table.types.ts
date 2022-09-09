@@ -17,6 +17,9 @@ export type RelationTable = {
     localId: string;
     refId: string;
     children?: RelationTable[];
+    options?: {
+        notUseJoinStatement?: boolean;
+    };
 };
 
 export interface ITables {

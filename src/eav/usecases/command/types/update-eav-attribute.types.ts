@@ -1,14 +1,5 @@
 import { Expose } from 'class-transformer';
-import {
-    IsNotEmpty,
-    IsString,
-    IsOptional,
-    MinLength,
-    IsEnum,
-    IsNumber,
-    IsBoolean,
-    IsArray,
-} from 'class-validator';
+import { IsDefined, IsString, MinLength, IsEnum, IsNumber, IsBoolean, IsArray } from 'class-validator';
 import { AuthInput } from '../../../../usecase';
 import { EavAttributeDTO } from '../../../dtos';
 import { EavAttribute } from '../../../entities';
@@ -26,38 +17,32 @@ export type UpdateEavAttributeUseCaseInput = {
 };
 export class UpdateEavAttributeUseCaseInputModel implements UpdateEavAttributeUseCaseInput {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     public readonly code!: string;
 
     @Expose()
-    @IsOptional()
     @IsString()
     @MinLength(1)
     public readonly label?: string;
 
     @Expose()
-    @IsOptional()
     @IsEnum(EavAttributeStatus)
     public readonly status?: EavAttributeStatus;
 
     @Expose()
-    @IsOptional()
     @IsNumber()
     public readonly sortOrder?: number;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly visibility?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly isRequired?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsArray()
     public readonly options?: any[];
 }

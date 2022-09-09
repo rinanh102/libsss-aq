@@ -54,7 +54,7 @@ export interface IQueryUtil<T = any> {
                 tb?: BaseTable;
                 relations?: RelationTable[];
             },
-    ): Partial<T>[];
+    ): Promise<Partial<T>[]>;
     findAndTransform(
         tableName: string,
         payload?: QueryInput<T>,
@@ -246,7 +246,7 @@ export class BaseQueryUtil<T = any> implements IQueryUtil<T> {
         return query;
     }
 
-    public transform(
+    public async transform(
         tableName: string,
         records: Optional<any[]>,
         options: QueryUtilMethodOptions &
@@ -269,27 +269,71 @@ export class BaseQueryUtil<T = any> implements IQueryUtil<T> {
         let finalResults = records;
 
         if (relations) {
+            const joinRelations = relations.filter((r) => !r.options?.notUseJoinStatement);
+            const notJoinRelations = relations.filter((r) => r.options?.notUseJoinStatement);
             const temps: Map<string, object> = new Map();
             const items: any = {};
+            const notJoinRelationsMapData = new Map<string, any>();
 
-            records.forEach((result: { [x: string]: any }) => {
-                const id = result[tb.getPrimaryKeyColumnName()];
+            if (joinRelations.length) {
+                records.forEach((result: { [x: string]: any }) => {
+                    const id = result[tb.getPrimaryKeyColumnName()];
 
-                if (!items[id]) items[id] = result;
+                    if (!items[id]) items[id] = result;
 
-                relations.forEach((relation) => {
-                    this._transformJoinResult({
-                        result,
-                        finalResult: items[id],
-                        relation,
-                        temps,
-                        itemId: id,
-                        type: TransformJoinResultTypes.MULTI,
+                    joinRelations.forEach((relation) => {
+                        this._transformJoinResult({
+                            result,
+                            finalResult: items[id],
+                            relation,
+                            temps,
+                            itemId: id,
+                            type: TransformJoinResultTypes.MULTI,
+                        });
                     });
                 });
-            });
+            }
 
-            finalResults = Object.keys(items).map((key) => items[key]);
+            if (notJoinRelations.length) {
+                await Promise.all(
+                    notJoinRelations.map(async (relation) => {
+                        const relationTable: BaseTable = this._getTable(relation.tableName)!;
+
+                        const localIds = Array.from(
+                            new Set(records.map((record) => record[`${tb.TABLE_NAME}.${relation.localId}`])),
+                        );
+
+                        const data = await this._client(relation.tableName)
+                            .whereIn(relation.refId, localIds)
+                            .select(relationTable.getSelectionFields({ tableName: relation.tableName }));
+
+                        data.forEach((item) => {
+                            const id = item[`${relationTable.TABLE_NAME}.${relation.refId}`];
+                            const current =
+                                notJoinRelationsMapData.get(id) ??
+                                notJoinRelationsMapData.set(id, {}).get(id);
+
+                            switch (relation.relationship) {
+                                case TableRelationships.ONE_TO_ONE:
+                                case TableRelationships.MANY_TO_ONE:
+                                    current[relation.name] = relationTable.toDTO(relationTable.toTable(item));
+                                    return;
+                                case TableRelationships.ONE_TO_MANY:
+                                case TableRelationships.MANY_TO_MANY:
+                                    if (!current[relation.name]) current[relation.name] = [];
+                                    current[relation.name].push(
+                                        relationTable.toDTO(relationTable.toTable(item)),
+                                    );
+                            }
+                        });
+                    }),
+                );
+            }
+
+            finalResults = Object.keys(items).map((key) => ({
+                ...items[key],
+                ...(notJoinRelationsMapData.get(key) ?? {}),
+            }));
         }
 
         return finalResults.map((result: any) => tb.toDTO(tb.toTable<BaseTable<T>>(result)));
@@ -688,28 +732,32 @@ export class BaseQueryUtil<T = any> implements IQueryUtil<T> {
         mainTableName?: string;
     }): Knex.QueryBuilder {
         if (relations) {
-            relations.forEach((relation) => {
-                const relationTable = this._getTable(relation.tableName)!;
+            relations
+                .filter((r) => !r.options?.notUseJoinStatement)
+                .forEach((relation) => {
+                    const relationTable = this._getTable(relation.tableName)!;
 
-                query.leftJoin(
-                    `${relationTable.TABLE_NAME} AS ${relation.constraintName}`,
-                    `${mainTableName ? mainTableName : mainTable.TABLE_NAME}.${relation.localId}`,
-                    `${relation.constraintName}.${relation.refId}`,
-                );
+                    query.leftJoin(
+                        `${relationTable.TABLE_NAME} AS ${relation.constraintName}`,
+                        `${mainTableName ? mainTableName : mainTable.TABLE_NAME}.${relation.localId}`,
+                        `${relation.constraintName}.${relation.refId}`,
+                    );
 
-                if (isSelect)
-                    query.select(relationTable.getSelectionFields({ tableName: relation.constraintName }));
+                    if (isSelect)
+                        query.select(
+                            relationTable.getSelectionFields({ tableName: relation.constraintName }),
+                        );
 
-                if (relation.children && relation.children.length) {
-                    this._buildJoinQuery({
-                        query,
-                        relations: relation.children,
-                        mainTable: relationTable,
-                        mainTableName: relation.constraintName,
-                        isSelect,
-                    });
-                }
-            });
+                    if (relation.children && relation.children.length) {
+                        this._buildJoinQuery({
+                            query,
+                            relations: relation.children,
+                            mainTable: relationTable,
+                            mainTableName: relation.constraintName,
+                            isSelect,
+                        });
+                    }
+                });
         }
 
         return query;

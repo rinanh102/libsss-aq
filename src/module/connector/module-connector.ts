@@ -69,8 +69,6 @@ export class RestfulService {
         } catch (error) {
             const axiosError = error as AxiosError;
 
-            console.log(`${this.constructor.name} call API error: \n`, axiosError.response?.data);
-
             const data: { error: any; message: string; details?: ClassError[] } = axiosError.response
                 ?.data as any;
 

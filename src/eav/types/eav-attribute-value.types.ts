@@ -1,5 +1,5 @@
 import { Expose, Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsDefined, IsString, IsArray, ValidateNested } from 'class-validator';
 
 // TYPE: create
 
@@ -11,15 +11,15 @@ export type EavAttributeValueCreateInput = {
 
 export class EavAttributeValueCreateInputModel implements EavAttributeValueCreateInput {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     public readonly value!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     public readonly code!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     public readonly entityId!: string;
 }
 export type EavAttributeValueCreateOutput = void;
@@ -45,11 +45,11 @@ export type CreateAttributesValuesInput = {
 
 export class CreateAttributeValuesInputModel {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     public readonly value!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     public readonly code!: string;
 }
@@ -80,28 +80,25 @@ class ItemAttributeValueModel {
     public readonly value?: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     public readonly code!: string;
 }
 
 export class UpdateAttributeValuesInputModel implements UpdateAttributesValuesInput {
     @Expose()
-    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ItemAttributeValueModel)
     public readonly deleteItems?: { code: string }[];
 
     @Expose()
-    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ItemAttributeValueModel)
     public readonly updateItems?: ItemAttributeValue[];
 
     @Expose()
-    @IsOptional()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ItemAttributeValueModel)

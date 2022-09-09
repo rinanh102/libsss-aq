@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsDefined, IsString } from 'class-validator';
 import { AuthInput } from '../../../../usecase';
 import { EavAttributeDTO } from '../../../dtos';
 import { EavAttribute } from '../../../entities';
@@ -10,7 +10,7 @@ export type DeleteEavAttributeUseCaseInput = {
 
 export class DeleteEavAttributeUseCaseInputModel implements DeleteEavAttributeUseCaseInput {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     public readonly code!: string;
 }

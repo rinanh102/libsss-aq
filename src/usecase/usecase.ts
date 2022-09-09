@@ -2,6 +2,7 @@ import { Optional } from '@heronjs/common';
 import { FilterInput, SortInput } from '../database/query-util';
 
 export type AuthInput<T = any> = {
+    isAdmin?: boolean;
     authId?: string;
     resourceFilter?: FilterInput<T>;
     metadata?: any;

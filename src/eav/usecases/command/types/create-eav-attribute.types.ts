@@ -1,12 +1,11 @@
 import { Expose } from 'class-transformer';
 import {
-    IsNotEmpty,
+    IsDefined,
     IsString,
     MinLength,
     MaxLength,
     Matches,
     IsEnum,
-    IsOptional,
     IsNumber,
     IsBoolean,
     IsArray,
@@ -29,7 +28,7 @@ export type CreateEavAttributeUseCaseInput = {
 
 export class CreateEavAttributeUseCaseInputModel implements CreateEavAttributeUseCaseInput {
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     @MinLength(1)
     @MaxLength(32)
@@ -37,38 +36,33 @@ export class CreateEavAttributeUseCaseInputModel implements CreateEavAttributeUs
     public readonly code!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsString()
     @MinLength(1)
     public readonly label!: string;
 
     @Expose()
-    @IsNotEmpty()
+    @IsDefined()
     @IsEnum(EavAttributeTypes)
     public readonly type!: EavAttributeTypes;
 
     @Expose()
-    @IsOptional()
     @IsEnum(EavAttributeStatus)
     public readonly status?: EavAttributeStatus;
 
     @Expose()
-    @IsOptional()
     @IsNumber()
     public readonly sortOrder?: number;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly visibility?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsBoolean()
     public readonly isRequired?: boolean;
 
     @Expose()
-    @IsOptional()
     @IsArray()
     public readonly options?: any[];
 }
